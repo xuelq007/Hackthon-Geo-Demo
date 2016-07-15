@@ -1,0 +1,130 @@
+<link rel="stylesheet" href="GeoCards.css">
+<dom-module id="geo-cards">
+	<template>
+		<div class="cards-container">
+			<div class="header">
+				<div class="title">Top posts</div>
+				<paper-spinner-lite class="orange" active id="cardsLoading"></paper-spinner-lite>
+			</div>
+			<div class="rows">
+				<template is="dom-repeat" items="{{data}}" id="cardList">
+          <paper-card image="{{item.url_n}}" class="white" preloadImage="true" title="{{item.title}}" on-click="onCardClick" on-keydown="onCardKeydown" tabindex="0">
+            <div class="card-actions horizontal justified" photoid="{{item.id}}">
+              <div class="card-hover" woeid="{{item.woeid}}"></div>
+              <div class="favorite-number">
+                <img src="../../images/fave.svg"></img>
+                <span>{{item.count_faves}}</span>
+              </div>
+              <div class="view-number">
+                <img src="../../images/view.svg"></img>
+                <span>{{item.views}}</span>
+              </div>
+            </div>
+          </paper-card>
+				</template>
+				<array-selector id="cardSelector" items="{{data}}" selected="{{selectedCard}}"></array-selector>
+			</div>
+		</div>
+
+	</template>
+	<script>
+		Polymer({
+			is: "geo-cards",
+			properties: {
+				data: {
+					type: Array,
+					norify: true
+				},
+				selectedCard: Object
+			},
+
+			ready: function () {
+				this.listen(window.document, 'geo.cards', 'onListenCards');
+				this.listen(document.body, 'searchPhoto', 'onListenSearch');
+		        this.$$('.rows').addEventListener('dom-change', function() {
+		          var cards = Polymer.dom(this.root).querySelectorAll('paper-card');
+		          cards.forEach(function(card) {
+		            var img = card.querySelector('img');
+		            img.onerror = function() {
+		              return true;
+		            }
+		            img.setAttribute('alt', card.getAttribute('title'));
+		          });
+		        }.bind(this));
+			},
+
+			onListenCards: function(e) {
+				this.$.cardsLoading.hidden = true;
+				var detail = e.detail;
+				if(detail.photos) {
+					var data = detail.photos && detail.photos.photo;
+					var filteredData = data.filter(function(photo) {
+						return !!photo.url_n;
+					});
+					this.set('data', filteredData);
+				} else if(!!detail.show) {
+					this.hidden = false;
+				}
+			},
+
+      onCardKeydown: function(e) {
+        if(e.keyCode === 13) {
+          this.onCardClick(e);
+        }
+      },
+
+			onListenSearch: function(e) {
+				this.set('data', []);
+				this.hidden = false;
+				this.$.cardsLoading.hidden = false;
+			},
+
+			onCardClick: function(e) {
+				var photo_id = e.currentTarget.querySelector('.card-actions').photoid;
+				var item = this.$.cardList.itemForElement(e.currentTarget);
+				var self = this;
+
+				var placeName = sessionStorage.getItem('placeName_' + photo_id);
+				if (!placeName) {
+					window.getAjax('/flickr/photo/detail?id=' + photo_id, function success(data) {
+						var response = JSON.parse(data);
+						var l = response.photo && response.photo.location;
+
+						if (!!l) {
+              item.placeName = "";
+              if(l.locality && l.locality._content) {
+                item.placeName += l.locality._content + ', ';
+              }
+              if(l.region && l.region._content) {
+                item.placeName += l.region._content + ', ';
+              }
+              if(l.country && l.country._content) {
+                item.placeName += l.country._content;
+              }
+						} else {
+							item.placeName = '--';
+						}
+
+						sessionStorage.setItem('placeName_' + photo_id, item.placeName);
+						self.fire('geo.details', { place: item.placeName });
+					}, function failure(err) {
+						console.log('err', err);
+					});
+
+					this.$.cardSelector.select(item);
+					this.hidden = true;
+					this.fire('geo.details', {
+						card: this.selectedCard
+					});
+				} else {
+					this.$.cardSelector.select(item);
+					this.selectedCard.placeName = placeName;
+					this.hidden = true;
+					this.fire('geo.details', {
+						card: this.selectedCard
+					});
+				}
+			}
+		});
+	</script>
+</dom-module>

@@ -1,0 +1,52 @@
+<link rel="stylesheet" href="GeoMap.css">
+<dom-module id="geo-map">
+  <template>
+      <google-map id="mapelement" api-key="AIzaSyAQ9aheR4s14JpBquPMk8bVf1mQ4pVh0tg" fit-to-markers>
+        <template is="dom-repeat" items="{{datas}}">
+        <google-map-marker animation="BOUNCE" latitude="{{item.latitude}}" longitude="{{item.longitude}}" draggable="true" title="{{item.title}}">
+             <google-map-info>
+               <p>{{item.title}}</p>
+             </google-map-info>
+          </google-map-marker>
+        </template>
+      </google-map>
+  </template>
+  <script>
+    Polymer({
+        is: "geo-map",
+        properties: {
+          datas: {
+            type: Array,
+            notify: true,
+            value: function () {
+              return [];
+            }
+          }
+        },
+
+        ready: function () {
+          this.listen(window.document, 'geo.cards', 'onListenCards');
+        },
+
+        created: function() {
+        },
+
+        attached: function () {
+        },
+
+        onListenCards: function(e) {
+          var detail = e.detail;
+          var data = detail.photos && detail.photos.photo;
+          if(!data) {
+            return;
+          }
+          var filteredData = data.filter(function(photo) {
+            return !!photo.url_n;
+          });
+          this.set('datas', filteredData);
+          this.fire('datasReady', {});
+      }
+    });
+
+  </script>
+</dom-module>

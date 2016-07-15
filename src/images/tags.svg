@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="31px" viewBox="0 0 30 31" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.8.3 (29802) - http://www.bohemiancoding.com/sketch -->
+    <title>Icons/tag_32</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="homepage" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="desktop-details" transform="translate(-962.000000, -242.000000)" fill="#F96161">
+            <g id="Group-8" transform="translate(961.000000, 170.000000)">
+                <g id="Group-5">
+                    <g id="Icons/tag_32" transform="translate(1.000000, 72.607708)">
+                        <path d="M17,0 L3,14 L0,17 L13,30 L16,27 L30,13 L30,0 L17,0 L17,0 Z M28,12.3505469 L14.3505469,26 L4,15.6494531 L17.6504706,2 L28,2 L28,12.3505469 L28,12.3505469 Z" id="Shape"></path>
+                        <circle id="Oval" cx="23" cy="7" r="2"></circle>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

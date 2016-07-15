@@ -1,0 +1,152 @@
+<link rel="stylesheet" href="GeoSearch.css">
+<dom-module id="geo-search">
+  <template>
+      <div class="search-bar">
+        <input id="addressInput" class="addressInput" type="" placeholder="Search for place of interests…" tabindex="0" />
+        <a title="clear input contents" class="clearInput" id="clearInput" style="visibility: hidden;" tabindex="0"></a>
+        <div class="search_magnifier" value='search'  on-click="search" tabindex="0"><div></div></div>
+      </div>
+  </template>
+  <script>
+    Polymer({
+        is: "geo-search",
+        properties: {
+              location: {
+                type: Object,
+                value: function () {
+                  return {
+                    lon:undefined,
+                    lat:undefined
+                  }
+                }
+              },
+              _lastLocatedText: String
+            },
+            ready: function() {
+              this.listen(document.body, 'searchPhoto', 'onListenSearch');
+            },
+            attached: function() {
+              var t = this;
+              document.addEventListener('google-map-ready', function(){
+                t._initialize();
+              });
+              
+              this._inputChanged();
+            },
+            detached: function() {
+              this.autocomplete = null;
+              window.google = null;
+            },
+            onListenSearch: function(e) {
+              var detail = e.detail;
+              if(!!detail.fill) {
+                this.$.addressInput.value = detail.data;
+              }
+            },
+            _mapsApiLoaded: function() {
+              this._initialize();
+            },
+            _inputChanged: function() {
+              var t = this, addressInput = t.$.addressInput;
+              var clearInput = t.$.clearInput;
+
+              clearInput.addEventListener('click', function() {
+                addressInput.value = "";
+                addressInput.focus();
+                clearInput.style.visibility="hidden";
+              });
+              this.addEventListener('keypress', function(e) {
+                if(e.target.click && e.keyCode == 13){
+                  e.target.click();
+                }                
+              });
+              addressInput.addEventListener('keydown', function() {
+                if(addressInput.value.trim() != "") {
+                  clearInput.style.visibility="visible";
+                } else {
+                  clearInput.style.visibility="hidden";
+                }
+              });
+              addressInput.addEventListener('keyup', function() {
+                if(addressInput.value.trim() != "") {
+                  clearInput.style.visibility="visible";
+                } else {
+                  clearInput.style.visibility="hidden";
+                }
+              });
+              addressInput.addEventListener('keypress', function(e) {
+                if (e.keyCode == 13) { //Enter keycode                        
+                    e.preventDefault();
+                    t.search();
+                }
+              });
+            },
+            _initialize: function() {
+              if (!this.isAttached) {
+                return;
+              }
+              if (this.autocomplete) {
+                return;
+              }
+              if (!(window.google && window.google.maps)) {
+                return;
+              }
+
+              var input = this.$.addressInput;
+              var options = { types: [] };
+              this.autocomplete = new window.google.maps.places.Autocomplete(input, options);
+
+              this._boundFillInAddress = this._fillInAddress.bind(this);
+              window.google.maps.event.addListener(this.autocomplete, 'place_changed', this._boundFillInAddress);
+
+              // input.addEventListener('blur', function() {
+              //   setTimeout(this._boundFillInAddress, 0);
+              // }.bind(this));
+            },
+            _fillInAddress: function() {
+              var place = this.autocomplete.getPlace();
+              if(place && place.geometry && place.geometry.location){
+                this.location.lon = place.geometry.location.lng();
+                this.location.lat = place.geometry.location.lat();
+                this._lastLocatedText = this.$.addressInput.value.trim();
+              }
+              else{
+                this.location = {
+                  lat:undefined,
+                  lon:undefined
+                }
+              }
+
+            },
+
+            search: function() {
+              var input = this.$.addressInput;
+              var curText = input.value.trim();
+              if(curText=="") {
+                input.focus();
+              }else {
+                if(curText === this._lastLocatedText){
+                  if(this.location.lat && this.location.lon) {
+                    this.searchPhotoByGeo(this.location);
+                  }else{
+                    this.searchPhotoByTag(curText);
+                  }
+                }else{
+                  this.searchPhotoByTag(curText);
+                }
+
+              }
+            },
+
+            searchPhotoByTag: function(tag) {
+              this.fire('searchPhoto', {type: 'byTag', data: tag});
+            },
+
+            searchPhotoByGeo: function(geo) {
+              this.fire('searchPhoto', {type: 'byGeo', data: geo});
+            }
+
+
+    });
+  </script>
+</dom-module>

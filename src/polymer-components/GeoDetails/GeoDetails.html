@@ -1,0 +1,116 @@
+<link rel="stylesheet" href="GeoDetails.css">
+<dom-module id="geo-details">
+	<template>
+		<div class="card-back">
+			<div class="container" tabindex="0" role="button" on-click="OnBackClick">
+				<div class="arrow-icon"></div>
+				<div class="label">Back</div>
+			</div>
+		</div>
+		<paper-card image="{{data.url_c}}" class="card-details-container" preloadImage="true">
+			<div class="card-details">
+			    <div class="card-content">
+			      <div class="card-content-item card-content-location">
+			      	<img src="../../images/place.svg"></img>
+			      	<span>{{placeName}}</span>
+		        </div>
+		        <div class="card-content-item card-content-tags">
+							<img src="../../images/tags.svg"></img>
+							<div>
+								<template is="dom-repeat" items="{{data.tags}}" as="tag">
+				      		<a href="javascript:void(0);" on-click="onTagClick">#{{tag}}</a>
+				      	</template>
+				      	<template is="dom-if" if="{{!data.tags}}">
+				      		<span>--</span>
+				      	</template>
+							</div>
+		        </div>
+		        <div class="card-content-item card-content-favorite">
+			      	<img src="../../images/fave.svg"></img>
+			      	<span>{{data.count_faves}}</span>
+		        </div>
+		        <div class="card-content-item card-content-focus">
+			      	<img src="../../images/view.svg"></img>
+			      	<span>{{data.views}}</span>
+		        </div>
+		        <div class="card-content-item card-content-home">
+			      	<img src="../../images/link.svg"></img>
+			      	<a href="{{data.url}}" target="_blank">Flickr</a>
+		        </div>
+			    </div>
+		    </div>
+		</paper-card>
+	</template>
+	<script>
+		Polymer({
+			is: "geo-details",
+			hostAttributes: {
+	            hidden: true
+	        },
+			properties: {
+				data: {
+					type: Object,
+					notify: true
+				},
+				placeName: {
+					type: String,
+					computed: 'computePlaceName(data.placeName)',
+					notify: true
+				}
+			},
+			attached: function () {
+				var t = this;
+				t.$$('.card-back').addEventListener('keypress', function keypress(e) {
+        			t.onKey(e);
+      			});
+			},
+
+			onKey: function (e) {
+		        if (e.target.click && e.keyCode === 13) {
+		          e.target.click();
+		        }
+			},
+
+			ready: function () {
+				this.listen(document.body, 'geo.details', 'onListenDetails');
+			},
+
+			computePlaceName: function(placeName) {
+				return placeName || '--';
+			},
+
+			onListenDetails: function(e) {
+				var detail = e.detail;
+				if(detail) {
+					var card = detail.card;
+					if(card) {
+						if(card.tags && typeof(card.tags) === 'string') {
+							var tags = card.tags.split(' ');
+							card.tags = tags;
+						}
+						this.set('data', card);
+						this.hidden = false;
+					}
+					var place = detail.place;
+					if(place) {
+						this.set('data.placeName', place);
+					}
+				}
+			},
+
+			OnBackClick: function(e) {
+				this.hidden = true;
+				this.fire('geo.cards', { show: true });
+			},
+
+			onTagClick: function(e) {
+				var target = e.target;
+				var tag = target.textContent.substr(1);
+				this.fire('searchPhoto', { type: 'byTag', data: tag, fill: true });
+				var actionBar = document.getElementById('action-bar');
+        actionBar.classList.remove('details-view');
+        this.hidden = true;
+			}
+		});
+	</script>
+</dom-module>

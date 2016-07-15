@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="import" href="/bower_components/polymer/polymer.html">
+  <link rel="import" href="/polymer-components/geoPhoto.html">
+</head>
+<body>
+  <header id="header">
+  <div class="welcome"><a href="/" tabindex="0">Geo<span class="highlight">Photo</span></a></div>
+  </header>
+  <div class="home-container" id="home-container">
+    <div class="widget-container">
+      <div class="search-container">
+        <div class="search-hint">Find the best spot to take photos!</div>
+        <div class="search-content">
+          <geo-search class="search-area"></geo-search>
+          <div class="my-geo" id="geo-icon" tabindex="0">
+            <div class="geo-icon"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="content-container list-view" id="content-container">
+    <div class="action-bar" id="action-bar">
+      <geo-search class="search-area"></geo-search>
+      <div class="action-icons">
+        <div class="icon list-view-icon" id="listIcon" tabindex="0"></div>
+        <div class="icon map-view-icon" id="mapIcon" tabindex="0"></div>
+      </div>
+    </div>
+    <geo-cards class="list-items"></geo-cards>
+    <geo-details></geo-details>
+    <geo-map class="map-items"></geo-map>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

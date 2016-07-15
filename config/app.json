@@ -1,0 +1,19 @@
+{
+  "config": {
+    "instagram": {
+      "client_id": "7295657d5a604d0abcd3e9593724aa66",
+      "client_secret": "fd6b2c09a15f444ca723e45bcf8065f8",
+      "access_token": "3538548582.1677ed0.00613bb5c3b7489690a3dd14cadc3d93"
+    },
+    "flickr": {
+      "key": "e31488ebdb0cfb1ce7ef2d84ccd4cd6b",
+      "secret": "3e8fb0bebf858ee8",
+      "user_id": "142320267@N08",
+      "access_token": "72157670999649985-dd27a20cf23c7ead",
+      "access_token_secret": "6931858e59e8b69d"
+    },
+    "google_map": {
+      "access_key": "AIzaSyAQ9aheR4s14JpBquPMk8bVf1mQ4pVh0tg"
+    }
+  }
+}
